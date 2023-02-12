@@ -25,7 +25,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:text="Tell me somethings interesting that happened to you today..."
+            android:text="Tell me something interesting that happened to you today..."
             android:textSize="20sp"
             android:gravity="center_horizontal"/>
 
@@ -44,21 +44,21 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/startrecordbutton"
+            android:id="@+id/previousquestionbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginRight="20dp"
-            android:text="Start Recording"
-            android:onClick="startRecording"/>
+            android:text="Previous Question"
+            android:onClick="getPreviousQuestion"/>
 
         <Button
-            android:id="@+id/stoprecordbutton"
+            android:id="@+id/nextquestionbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Stop Recording"
-            android:onClick="stopRecording"/>
+            android:text="Next Question"
+            android:onClick="getNextQuestion"/>
     </LinearLayout>
 
     </LinearLayout>
