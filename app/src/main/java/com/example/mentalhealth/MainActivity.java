@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         tv1.setText(questions[nextIndex]);
         MainActivity.questionIndex = nextIndex;
     }
-    //added a comment here
+
     public void getPreviousQuestion(View view) {
         int previousIndex;
         if (MainActivity.questionIndex == 0) {

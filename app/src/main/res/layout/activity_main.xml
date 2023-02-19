@@ -24,43 +24,51 @@
             android:id="@+id/questionTextView"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
             android:text="Tell me something interesting that happened to you today..."
-            android:textSize="20sp"
-            android:gravity="center_horizontal"/>
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/listenemojiimageView"
             android:layout_width="297dp"
-            android:layout_height="382dp"
-            app:srcCompat="@drawable/listenemoji"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_height="308dp"
+            android:layout_gravity="center_horizontal"
+            app:srcCompat="@drawable/listenemoji" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:orientation="horizontal" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="86dp"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <Button
+                android:id="@+id/previousquestionbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:onClick="getPreviousQuestion"
+                android:text="Previous Question" />
+
+            <Button
+                android:id="@+id/nextquestionbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="getNextQuestion"
+                android:text="Next Question" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/previousquestionbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/recordVideoButton"
+            android:layout_width="208dp"
+            android:layout_height="103dp"
+            android:layout_marginLeft="90sp"
             android:layout_weight="1"
-            android:layout_marginRight="20dp"
-            android:text="Previous Question"
-            android:onClick="getPreviousQuestion"/>
-
-        <Button
-            android:id="@+id/nextquestionbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Next Question"
-            android:onClick="getNextQuestion"/>
-    </LinearLayout>
-
+            android:onClick="recordVideo"
+            android:text="Record Video" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
