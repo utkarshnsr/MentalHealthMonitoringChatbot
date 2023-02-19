@@ -64,7 +64,7 @@
         <Button
             android:id="@+id/recordVideoButton"
             android:layout_width="208dp"
-            android:layout_height="103dp"
+            android:layout_height="100dp"
             android:layout_marginLeft="90sp"
             android:layout_weight="1"
             android:onClick="recordVideo"
