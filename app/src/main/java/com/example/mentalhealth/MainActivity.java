@@ -35,10 +35,14 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(data.getData().toString()).show();
+            /*
             VideoView videoView = new VideoView(this);
             videoView.setVideoURI(data.getData());
             videoView.start();
             builder.setView(videoView).show();
+            */
+
         }
     }
 
