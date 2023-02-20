@@ -12,13 +12,56 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import org.bson.Document;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class MainActivity extends AppCompatActivity {
     public static int questionIndex = 0;
     public static String[] questions = {"Tell me something interesting that happened to you today..","How are you feeling?","Are you excited about today?"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        System.out.println("BEFORE TRY");
+
+        try {
+            OkHttpClient client = new OkHttpClient().newBuilder().build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, "{\n    \"collection\":\"Questions\",\n    \"database\":\"videoRecords\",\n    \"dataSource\":\"MentalHealthCluster\",\n    \"projection\": {\"question\": 1}\n\n}");
+            Request request = new Request.Builder()
+                    .url("https://us-east-1.aws.data.mongodb-api.com/app/data-aibcf/endpoint/data/v1/action/find")
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Access-Control-Request-Headers", "*")
+                    .addHeader("api-key", "FlALV8Uy8CjoZTNGMSRJevh7leeBWMfSmDGqsZzfrR83gUCgCUELAjxCNdN6PDO1")
+                    .build();
+            Response response = client.newCall(request).execute();
+            System.out.println("IN TRY");
+            System.out.println(response.body().string());
+        } catch (Exception e) {
+            System.out.println("IN EXCEPTION");
+            System.out.println(e);
+        }
+
+
+
 
 
         findViewById(R.id.recordVideoButton).setOnClickListener(new View.OnClickListener() {
