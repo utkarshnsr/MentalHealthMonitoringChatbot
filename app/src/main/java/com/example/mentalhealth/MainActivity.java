@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         findViewById(R.id.recordVideoButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -35,14 +36,13 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(data.getData().toString()).show();
+            builder.setMessage(data.getData().getPath()).show();
             /*
             VideoView videoView = new VideoView(this);
             videoView.setVideoURI(data.getData());
             videoView.start();
             builder.setView(videoView).show();
             */
-
         }
     }
 
