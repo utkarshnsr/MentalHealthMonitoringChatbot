@@ -1,63 +1,167 @@
 package com.example.mentalhealth;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.VideoCapture;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.google.common.util.concurrent.ListenableFuture;
 
-import org.bson.Document;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
+/*
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-public class MainActivity extends AppCompatActivity implements Runnable {
+*/
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static int questionIndex = 0;
-    public static String[] questions = {"Tell me something interesting that happened to you today..","How are you feeling?","Are you excited about today?"};
+    public static String[] questions = {"Tell me something interesting that happened to you today..", "How are you feeling?", "Are you excited about today?"};
+
+    Button recordButton;
+    private VideoCapture videoCapture;
+
+    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+        recordButton = findViewById(R.id.recordVideoButton);
+
+        recordButton.setText("start recording");
+
+        recordButton.setOnClickListener(this);
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        cameraProviderFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                startCameraX(cameraProvider);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, getExecutor());
+        /*
         MainActivity m1 = new MainActivity();
         Thread connectToDB = new Thread(m1);
         connectToDB.start();
 
-
-        findViewById(R.id.recordVideoButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                startActivityForResult(intent, 1);
-            }
-        });
+         */
     }
 
+    private Executor getExecutor() {
+        return ContextCompat.getMainExecutor(this);
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void startCameraX(ProcessCameraProvider cameraProvider) {
+        cameraProvider.unbindAll();
+
+        CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
+
+        videoCapture = new VideoCapture.Builder().setVideoFrameRate(30).build();
+
+        cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, videoCapture);
+    }
+
+    @SuppressLint("RestrictedApi")
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.recordVideoButton:
+                if (recordButton.getText() == "start recording") {
+                    System.out.println("IN RECORDING");
+                    recordButton.setText("stop recording");
+                    recordVideo();
+                } else {
+                    recordButton.setText("start recording");
+                    videoCapture.stopRecording();
+                }
+                break;
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void recordVideo() {
+        System.out.println("IN RECORD VIDEO");
+        if (videoCapture != null) {
+
+
+            long timestamp = System.currentTimeMillis();
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, timestamp);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
+
+            try {
+
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                videoCapture.startRecording(
+                        new VideoCapture.OutputFileOptions.Builder(
+                                getContentResolver(),
+                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                contentValues
+                        ).build(),
+                        getExecutor(),
+                        new VideoCapture.OnVideoSavedCallback() {
+                            @Override
+                            public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults) {
+                                Toast.makeText(MainActivity.this, "Video has been saved successfully.", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause) {
+                                Toast.makeText(MainActivity.this, "Error saving video: " + message, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+    /*
     public void run() {
         System.out.println("RUNNING SECOND THREAD");
+
         try {
+
             OkHttpClient client = new OkHttpClient().newBuilder().build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, "{\n    \"collection\":\"Questions\",\n    \"database\":\"videoRecords\",\n    \"dataSource\":\"MentalHealthCluster\",\n    \"projection\": {\"question\": 1}\n\n}");
@@ -75,22 +179,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             System.out.println("INSIDE CATCH");
             System.out.println(e);
         }
+
+
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == 1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(data.getData().getPath()).show();
-            /*
-            VideoView videoView = new VideoView(this);
-            videoView.setVideoURI(data.getData());
-            videoView.start();
-            builder.setView(videoView).show();
-            */
-        }
-    }
+     */
+
 
     public void getNextQuestion(View view) {
         int nextIndex;

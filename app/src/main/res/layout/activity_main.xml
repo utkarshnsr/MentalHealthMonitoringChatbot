@@ -66,9 +66,7 @@
             android:layout_width="208dp"
             android:layout_height="100dp"
             android:layout_marginLeft="90sp"
-            android:layout_weight="1"
-            android:onClick="recordVideo"
-            android:text="Record Video" />
+            android:layout_weight="1" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
