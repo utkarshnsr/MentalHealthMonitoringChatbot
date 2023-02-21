@@ -12,26 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 
-import org.bson.Document;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-public class MainActivity extends AppCompatActivity implements Runnable {
+public class MainActivity extends AppCompatActivity {
     public static int questionIndex = 0;
     public static String[] questions = {"Tell me something interesting that happened to you today..","How are you feeling?","Are you excited about today?"};
 
@@ -39,10 +22,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        MainActivity m1 = new MainActivity();
-        Thread connectToDB = new Thread(m1);
-        connectToDB.start();
 
 
         findViewById(R.id.recordVideoButton).setOnClickListener(new View.OnClickListener() {
@@ -54,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             }
         });
     }
-
+    /*
     public void run() {
         System.out.println("RUNNING SECOND THREAD");
         try {
@@ -76,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             System.out.println(e);
         }
     }
+
+     */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
