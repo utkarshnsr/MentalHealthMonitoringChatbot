@@ -29,12 +29,18 @@
             android:text="Tell me something interesting that happened to you today..."
             android:textSize="20sp" />
 
-        <ImageView
+
+        <!--<ImageView
             android:id="@+id/listenemojiimageView"
             android:layout_width="297dp"
             android:layout_height="308dp"
             android:layout_gravity="center_horizontal"
-            app:srcCompat="@drawable/listenemoji" />
+            app:srcCompat="@drawable/listenemoji" />-->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="90" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,7 +72,8 @@
             android:layout_width="208dp"
             android:layout_height="100dp"
             android:layout_marginLeft="90sp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="Start Recording"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

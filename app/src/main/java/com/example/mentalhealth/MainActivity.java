@@ -5,8 +5,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.Preview;
 import androidx.camera.core.VideoCapture;
 import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
@@ -39,7 +41,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static int questionIndex = 0;
     public static String[] questions = {"Tell me something interesting that happened to you today..", "How are you feeling?", "Are you excited about today?"};
-
+    PreviewView previewView;
     Button recordButton;
     private VideoCapture videoCapture;
 
@@ -48,9 +50,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
 
-
+        previewView = findViewById(R.id.previewView);
 
         recordButton = findViewById(R.id.recordVideoButton);
 
@@ -62,18 +66,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
                 startCameraX(cameraProvider);
+                /*MainActivity m1 = new MainActivity();
+                Thread connectToDB = new Thread(m1);
+                connectToDB.start();*/
             } catch (ExecutionException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }, getExecutor());
-        /*
-        MainActivity m1 = new MainActivity();
-        Thread connectToDB = new Thread(m1);
-        connectToDB.start();
 
-         */
+
     }
 
     private Executor getExecutor() {
@@ -82,13 +85,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @SuppressLint("RestrictedApi")
     private void startCameraX(ProcessCameraProvider cameraProvider) {
-        cameraProvider.unbindAll();
+        try {
+            cameraProvider.unbindAll();
+            CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
+            Preview preview = new Preview.Builder()
+                    .build();
 
-        CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
+            preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
-        videoCapture = new VideoCapture.Builder().setVideoFrameRate(30).build();
 
-        cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, videoCapture);
+            // Video capture use case
+            videoCapture = new VideoCapture.Builder()
+                    .setVideoFrameRate(30)
+                    .build();
+
+
+            //bind to lifecycle:
+
+            cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, videoCapture);
+        } catch (Exception e) {
+            System.out.println("IN START CAMERA X EXCEPTION");
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -98,6 +115,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (recordButton.getText() == "start recording") {
                     System.out.println("IN RECORDING");
                     recordButton.setText("stop recording");
+                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
                     recordVideo();
                 } else {
                     recordButton.setText("start recording");
@@ -141,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new VideoCapture.OnVideoSavedCallback() {
                             @Override
                             public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults) {
+                                System.out.println(outputFileResults);
+                                System.out.println("IN VIDEO SAVED");
                                 Toast.makeText(MainActivity.this, "Video has been saved successfully.", Toast.LENGTH_SHORT).show();
                             }
 
@@ -209,6 +238,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv1.setText(questions[previousIndex]);
         MainActivity.questionIndex = previousIndex;
     }
-
 
 }
